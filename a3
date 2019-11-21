@@ -1,0 +1,49 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream> 
+#include <vector>
+#include <stdlib.h>
+
+
+using std::vector;
+using namespace std;
+
+
+int main() {
+	string fileName;
+	string line;
+	ifstream fin;
+	ofstream fout;
+	char chunkLength[4];
+	char chunkType[4];
+	char chunkData[4];
+	
+	// opening greeting
+	cout << endl;
+	cout << "Image Processing Software" << endl;
+	cout << endl;
+	cout << "Specify the name of a PNG file that you would like to process." << endl;
+	cout << ">";
+	cin >> fileName;
+	
+	
+	
+	if (fileName=="brainbow") {
+		fin.open("brainbow.png", ios_base::in | ios_base::binary);
+		char sig[8];
+		fin.read(sig,8);
+	
+		while (!fin.eof()) {
+		fin.read(chunkLength,4);
+		fin.read(chunkType,4);
+		fin.read(chunkData,4);
+		}
+		fin.close();	
+	} else cout << "Unable to open file"; 
+	
+	return 0;
+}
+
+//if (chunkType[0] == '73' && ...)  then iHDR
+	
