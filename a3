@@ -8,7 +8,6 @@
 
 using std::vector;
 using namespace std;
-uint32_t bytesToInt(uint8_t data[4]);
 
 int main() {
 	string fileName;
