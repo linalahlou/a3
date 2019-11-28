@@ -14,10 +14,8 @@ int main() {
 	string fileName;
 	string line;
 	ifstream fin;
-	//ofstream fout;
 	char chunkLength[4];
 	char chunkType[4];
-	
 	char sig[8];
 	char crc[4];
 	
@@ -41,13 +39,15 @@ int main() {
 	};
 	
 	// reading file 
-	//if (fileName=="brainbow"){
-		fin.open(fileName, ios_base::in | ios_base::binary);
+	if ((fileName=="brainbow") || (fileName=="brainbow.png")){
+		fin.open("brainbow.png", ios_base::in | ios_base::binary);
 		if (fin) {
 			cout << '\n';
-			cout << "Loading "<< fileName << " ..." << endl<< endl;
+			cout << "Loading brainbow.png " << " ..." << endl<< endl;
 			fin.read(sig,8);
+			
 			while (!fin.eof()) {
+				
 				fin.read(chunkLength,4);
 				fin.read(chunkType,4);
 				unsigned long length = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]);
@@ -79,12 +79,10 @@ int main() {
 					cout << "intl method:\t" << header.intlMethod << endl;
 					cout << '\n';
 				}
-					
-			}
-			
+			}	
 		fin.close();	
 		}
-	//} else cout << "Unable to open file"; 
+	} else cout << "Unable to open file"; 
 	
 	return 0;
 }
