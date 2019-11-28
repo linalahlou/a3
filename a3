@@ -30,9 +30,9 @@ int main() {
 	cin >> fileName;
 	
 	// reading file 
-	//if (fileName=="brainbow") {
-		fin.open(fileName, ios_base::in | ios_base::binary);
-		//if (fin) {
+	if (fileName=="brainbow") {
+		fin.open("brainbow.png", ios_base::in | ios_base::binary);
+		if (fin) {
 			cout << "Loading "<< fileName << endl<< endl;
 			fin.read(sig,8);
 			while (!fin.eof()) {
@@ -43,17 +43,15 @@ int main() {
 				fin.read(chunkData,l);
 				fin.read(crc,4);
 				unsigned long q = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]);
-
+				cout << l <<" "<<q << endl;
 				
-				cout << l << endl;
-
 				//if (chunkType == IHDR)
 					
 			}
 			
 		fin.close();	
-		//}
-	//} else cout << "Unable to open file"; 
+		}
+	} else cout << "Unable to open file"; 
 	
 	return 0;
 }
