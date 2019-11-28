@@ -8,7 +8,7 @@
 
 using std::vector;
 using namespace std;
-
+uint32_t bytesToInt(uint8_t data[4]);
 
 int main() {
 	string fileName;
@@ -29,32 +29,65 @@ int main() {
 	cout << ">";
 	cin >> fileName;
 	
+	//struct definition 
+	struct characteristics {
+		int width=0;
+		int height=0;
+		int bitDepth=0;
+		int colorType=0;
+		int compMethod=0;
+		int filtMethod=0;
+		int intlMethod=0;	
+	};
+	
 	// reading file 
-	if (fileName=="brainbow") {
-		fin.open("brainbow.png", ios_base::in | ios_base::binary);
+	//if (fileName=="brainbow"){
+		fin.open(fileName, ios_base::in | ios_base::binary);
 		if (fin) {
-			cout << "Loading "<< fileName << endl<< endl;
+			cout << '\n';
+			cout << "Loading "<< fileName << " ..." << endl<< endl;
 			fin.read(sig,8);
 			while (!fin.eof()) {
 				fin.read(chunkLength,4);
 				fin.read(chunkType,4);
-				unsigned long l = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]);
-				char* chunkData = new char[l];
-				fin.read(chunkData,l);
+				unsigned long length = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]);
+				char* chunkData = new char[length];
+				fin.read(chunkData,length);
 				fin.read(crc,4);
-				unsigned long q = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]);
-				cout << l <<" "<<q << endl;
+				unsigned long c = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]);
+				cout << chunkType<<" "<<length <<" "<< c << endl;
 				
-				//if (chunkType == IHDR)
+				cout << '\n';
+				
+				characteristics header;
+				if ((chunkType[0] == 'I') && (chunkType[1] == 'H') && (chunkType[2] == 'D') && (chunkType[3] == 'R')) {
+					unsigned long width = ((unsigned char)chunkData[0]<<24) + ((unsigned char)chunkData[1]<<16) + ((unsigned char)chunkData[2]<<8) + ((unsigned char)chunkData[3]);
+					header.width=width;
+					cout << "width:\t\t" << header.width << endl;
+					unsigned long height = ((unsigned char)chunkData[4]<<24) + ((unsigned char)chunkData[5]<<16) + ((unsigned char)chunkData[6]<<8) + ((unsigned char)chunkData[7]);
+					header.height=height;
+					cout << "height:\t\t" << header.height << endl;
+					header.bitDepth = chunkData[8];
+					cout << "bitdepth:\t" << header.bitDepth << endl;
+					header.colorType = chunkData[9];
+					cout << "colortype:\t" << header.colorType << endl;
+					header.compMethod = chunkData[10];
+					cout << "comp method:\t" << header.compMethod << endl;
+					header.filtMethod = chunkData[11];
+					cout << "filt method:\t" << header.filtMethod << endl;
+					header.intlMethod = chunkData[12];
+					cout << "intl method:\t" << header.intlMethod << endl;
+					cout << '\n';
+				}
 					
 			}
 			
 		fin.close();	
 		}
-	} else cout << "Unable to open file"; 
+	//} else cout << "Unable to open file"; 
 	
 	return 0;
 }
 
-//if (chunkType[0] == '73' && ...)  then iHDR
+
 	
