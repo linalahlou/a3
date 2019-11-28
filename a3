@@ -14,10 +14,12 @@ int main() {
 	string fileName;
 	string line;
 	ifstream fin;
-	ofstream fout;
+	//ofstream fout;
 	char chunkLength[4];
 	char chunkType[4];
-	char chunkData[4];
+	
+	char sig[8];
+	char crc[4];
 	
 	// opening greeting
 	cout << endl;
@@ -27,20 +29,31 @@ int main() {
 	cout << ">";
 	cin >> fileName;
 	
-	
-	
-	if (fileName=="brainbow") {
-		fin.open("brainbow.png", ios_base::in | ios_base::binary);
-		char sig[8];
-		fin.read(sig,8);
-	
-		while (!fin.eof()) {
-		fin.read(chunkLength,4);
-		fin.read(chunkType,4);
-		fin.read(chunkData,4);
-		}
+	// reading file 
+	//if (fileName=="brainbow") {
+		fin.open(fileName, ios_base::in | ios_base::binary);
+		//if (fin) {
+			cout << "Loading "<< fileName << endl<< endl;
+			fin.read(sig,8);
+			while (!fin.eof()) {
+				fin.read(chunkLength,4);
+				fin.read(chunkType,4);
+				unsigned long l = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]);
+				char* chunkData = new char[l];
+				fin.read(chunkData,l);
+				fin.read(crc,4);
+				unsigned long q = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]);
+
+				
+				cout << l << endl;
+
+				//if (chunkType == IHDR)
+					
+			}
+			
 		fin.close();	
-	} else cout << "Unable to open file"; 
+		//}
+	//} else cout << "Unable to open file"; 
 	
 	return 0;
 }
