@@ -1,22 +1,19 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream> 
-#include <vector>
-#include <stdlib.h>
+#include <iostream>											// include the header for cout, cin...
+#include <fstream>											// include the header for file hanfling
+#include <string>											// include the header for string handlind
+#include <sstream> 											// include the header for for string handling
+#include <stdlib.h>											// include the header to use exit function
+#include "puff.h"											// include the file puff to use it in the next step
 
-
-using std::vector;
 using namespace std;
 
 int main() {
-	string fileName;
-	string line;
-	ifstream fin;
-	char chunkLength[4];
-	char chunkType[4];
-	char sig[8];
-	char crc[4];
+	string fileName;										// string variable to store the name of the file to open 
+	ifstream fin;											// declaration of input stream from file
+	char chunkLength[4]; 									// declaration of array to store the lenght of the chunks 
+	char chunkType[4]; 										// declaration of array to store the type of the chunks 
+	char sig[8]; 											// declaration of array to store the signature of the png file
+	char crc[4]; 											// declaration of array to store the crc numbers
 	
 	// opening greeting
 	cout << endl;
@@ -26,7 +23,7 @@ int main() {
 	cout << ">";
 	cin >> fileName;
 	
-	//struct definition 
+	//struct definition for the IHDH characteristics
 	struct characteristics {
 		int width=0;
 		int height=0;
@@ -38,51 +35,53 @@ int main() {
 	};
 	
 	// reading file 
-	if ((fileName=="brainbow") || (fileName=="brainbow.png")){
-		fin.open("brainbow.png", ios_base::in | ios_base::binary);
-		if (fin) {
+	if ((fileName=="brainbow") || (fileName=="brainbow.png")){			// if user types the file name with or without .png
+		fin.open("brainbow.png", ios_base::in | ios_base::binary);		// open file 
+		if (fin) {														// if the file opens correctly 
 			cout << '\n';
 			cout << "Loading brainbow.png " << " ..." << endl<< endl;
-			fin.read(sig,8);
+			fin.read(sig,8);											// read signature so the program can read the important values afterwards
 			
-			while (!fin.eof()) {
+			while (!fin.eof()) {										// while there is not the end of file marker
 				
-				fin.read(chunkLength,4);
-				fin.read(chunkType,4);
-				unsigned long length = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]);
-				char* chunkData = new char[length];
-				fin.read(chunkData,length);
-				fin.read(crc,4);
-				unsigned long c = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]);
-				cout << chunkType<<" "<<length <<" "<< c << endl;
+				fin.read(chunkLength,4);								// read the first 4 bytes after signature and store it as the lenght of the chunk 
+				fin.read(chunkType,4);									// read the next 4 bytes after signature and store it as the lenght of the chunk
+				unsigned long length = ((unsigned char)chunkLength[0]<<24) + ((unsigned char)chunkLength[1]<<16) + ((unsigned char)chunkLength[2]<<8) + ((unsigned char)chunkLength[3]); // convert lenght to an int
+				char* chunkData = new char[length];						// declaration of array to store chunk data
+				fin.read(chunkData,length);								// read the next length bytes after signature and store it as the chunk data
+				fin.read(crc,4);										// read the next 4 bytes after signature and store it as the chunk data
+				unsigned long c = ((unsigned char)crc[0]<<24) + ((unsigned char)crc[1]<<16) + ((unsigned char)crc[2]<<8) + ((unsigned char)crc[3]); // convert crc number to an int 
+				cout << chunkType<<" "<<length <<" "<< c << endl;		// prints chunk types, lenght and crc numbers 
 				
 				cout << '\n';
 				
 				characteristics header;
-				if ((chunkType[0] == 'I') && (chunkType[1] == 'H') && (chunkType[2] == 'D') && (chunkType[3] == 'R')) {
+				if ((chunkType[0] == 'I') && (chunkType[1] == 'H') && (chunkType[2] == 'D') && (chunkType[3] == 'R')) {		// if we encounter the IDAT chunk
 					unsigned long width = ((unsigned char)chunkData[0]<<24) + ((unsigned char)chunkData[1]<<16) + ((unsigned char)chunkData[2]<<8) + ((unsigned char)chunkData[3]);
 					header.width=width;
-					cout << "width:\t\t" << header.width << endl;
+					cout << "width:\t\t" << header.width << endl;			//displays the width
 					unsigned long height = ((unsigned char)chunkData[4]<<24) + ((unsigned char)chunkData[5]<<16) + ((unsigned char)chunkData[6]<<8) + ((unsigned char)chunkData[7]);
 					header.height=height;
-					cout << "height:\t\t" << header.height << endl;
+					cout << "height:\t\t" << header.height << endl;			//displays the height
 					header.bitDepth = chunkData[8];
-					cout << "bitdepth:\t" << header.bitDepth << endl;
+					cout << "bitdepth:\t" << header.bitDepth << endl;		//displays the width
 					header.colorType = chunkData[9];
-					cout << "colortype:\t" << header.colorType << endl;
+					cout << "colortype:\t" << header.colorType << endl;		//displays the colour type
 					header.compMethod = chunkData[10];
-					cout << "comp method:\t" << header.compMethod << endl;
+					cout << "comp method:\t" << header.compMethod << endl;	//displays the compression method 
 					header.filtMethod = chunkData[11];
-					cout << "filt method:\t" << header.filtMethod << endl;
+					cout << "filt method:\t" << header.filtMethod << endl;	//displays the filterinf method
 					header.intlMethod = chunkData[12];
-					cout << "intl method:\t" << header.intlMethod << endl;
+					cout << "intl method:\t" << header.intlMethod << endl;	//displays the interlace method
 					cout << '\n';
 				}
 			}	
-		fin.close();	
+		fin.close();											// close the file 
 		}
-	} else cout << "Unable to open file"; 
-	
+	} else {
+		cout << "Unable to open file"; 						// if unable to open file; displays message and exit program
+		exit (1);
+	}
 	return 0;
 }
 
